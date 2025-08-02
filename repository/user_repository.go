@@ -6,11 +6,11 @@ import (
 	"rest_api_golang/model/domain"
 )
 
-type CategoryRepository interface {
-	Login(ctx context.Context, tx *sql.Tx, user domain.User) domain.User
+type UserRepository interface {
 	Register(ctx context.Context, tx *sql.Tx, user domain.User) domain.User
 	FindById(ctx context.Context, tx *sql.Tx, userId int) (domain.User, error)
-	FindAll(ctx context.Context, tx *sql.Tx) []domain.Category
+	FindAll(ctx context.Context, tx *sql.Tx) []domain.User
+	FindByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.User, error)
 }
 
 
