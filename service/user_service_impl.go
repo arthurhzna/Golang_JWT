@@ -68,9 +68,66 @@ func (service *UserServiceImpl) Login(ctx context.Context, request web.UserLogin
     refreshToken, refreshClaims, err := service.UserToken.GenerateToken(user, 24*time.Hour)
     helper.ErrorConditionCheck(err)
 
-	
+	session := domain.Session{
+		ID: refreshClaims.RegisteredClaims.ID,
+		User_Email: user.Email,
+		Refresh_Token: refreshToken,
+		Is_Revoked: false,
+		Expires_At: refreshClaims.RegisteredClaims.ExpiresAt,
+	}
+	session, err = service.UserRepository.CreateSession(ctx, tx, session)
+	helper.ErrorConditionCheck(err)
 
-	return helper.ToUserLoginResponse(accessToken, accessClaims)
+	return helper.ToUserLoginResponse(accessToken, accessClaims, refreshToken, session, user)
+}
+
+func (service *UserServiceImpl) Logout(ctx context.Context, sessionId string) {
+	tx, err := service.DB.Begin()
+	helper.ErrorConditionCheck(err)
+	defer helper.CommitOrRollback(tx)
+
+	service.UserRepository.DeleteSession(ctx, tx, sessionId)
+	helper.ErrorConditionCheck(err)
+
+}
+
+func (service *UserServiceImpl) RenewAccessToken(ctx context.Context, request web.RenewAccessTokenRequest) web.RenewAccessTokenResponse {
+	err := service.Validate.Struct(request)
+	helper.ErrorConditionCheck(err)
+
+	tx, err := service.DB.Begin()
+	helper.ErrorConditionCheck(err)
+	defer helper.CommitOrRollback(tx)
+
+	refreshToken, refreshClaims, err := service.UserToken.ValidateToken(request.RefreshToken)
+
+	session, err := service.UserRepository.GetSession(ctx, tx, refreshClaims.RegisteredClaims.ID)
+
+	if session.Is_Revoked {
+		helper.ErrorConditionCheck(errors.New("session is revoked"))
+	}
+
+	if session.User_Email != refreshClaims.Email {
+		helper.ErrorConditionCheck(errors.New("refresh token is invalid"))
+	}
+
+	accessToken, accessClaims, err := service.UserToken.GenerateToken(user, 15*time.Minute) // ubah di user_token, jangan langsung menerima struct user, tetapi 1 1 saja
+	helper.ErrorConditionCheck(err)
+
+	return helper.ToRenewAccessTokenResponse(accessToken, accessClaims)
+
+func (service *UserServiceImpl) RevokeSession(ctx context.Context, sessionId string) {
+	tx, err := service.DB.Begin()
+	helper.ErrorConditionCheck(err)
+	defer helper.CommitOrRollback(tx)
+
+	service.UserRepository.RevokeSession(ctx, tx, sessionId)
+	helper.ErrorConditionCheck(err)
+
+}
+
+
+
 
 
 
