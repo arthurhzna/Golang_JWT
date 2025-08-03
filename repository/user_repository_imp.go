@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"rest_api_golang/helper"
-	"rest_api_golang/model/domain"
+	"golang_jwt/helper"
+	"golang_jwt/model/domain"
 )
 
 type userRepositoryImpl struct {
@@ -58,7 +58,7 @@ func (repository *userRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.T
 	SQL := "SELECT id, username, email, password FROM users WHERE email = $1"
 	row := tx.QueryRowContext(ctx, SQL, email)
 	
-	var user domain.User
+	user := domain.User{}
 	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -68,3 +68,21 @@ func (repository *userRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.T
 	}
 	return user, nil
 }
+
+func (repository *userRepositoryImpl) CreateSession(ctx context.Context, tx *sql.Tx, session domain.Session) domain.Session {
+	SQL := "INSERT INTO sessions (id, user_email, refresh_token, is_revoked, expires_at) VALUES ($1, $2, $3, $4, $5)"
+	_, err := tx.ExecContext(ctx, SQL, session.ID, session.User_Email, session.Refresh_Token, session.Is_Revoked, session.Expires_At)
+	helper.ErrorConditionCheck(err)
+	return session
+}
+
+func (repository *userRepositoryImpl) GetSession(ctx context.Context, tx *sql.Tx, id string) (domain.Session, error) {
+	SQL := "SELECT * FROM sessions WHERE id = $1"
+	row := tx.QueryRowContext(ctx, SQL, id)
+	
+	session := domain.Session{}
+	err := row.Scan(&session.ID, &session.User_Email, &session.Refresh_Token, &session.Is_Revoked, &session.Expires_At)
+	helper.ErrorConditionCheck(err)
+	return session, nil
+}
+
