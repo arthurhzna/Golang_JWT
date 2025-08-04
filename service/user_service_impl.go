@@ -99,9 +99,11 @@ func (service *UserServiceImpl) RenewAccessToken(ctx context.Context, request we
 	helper.ErrorConditionCheck(err)
 	defer helper.CommitOrRollback(tx)
 
-	refreshToken, refreshClaims, err := service.UserToken.ValidateToken(request.RefreshToken)
+	refreshClaims, err := service.UserToken.ValidateToken(request.RefreshToken)
+	helper.ErrorConditionCheck(err)
 
 	session, err := service.UserRepository.GetSession(ctx, tx, refreshClaims.RegisteredClaims.ID)
+	helper.ErrorConditionCheck(err)
 
 	if session.Is_Revoked {
 		helper.ErrorConditionCheck(errors.New("session is revoked"))
@@ -126,6 +128,27 @@ func (service *UserServiceImpl) RevokeSession(ctx context.Context, sessionId str
 
 }
 
+func (service *UserServiceImpl) FindById(ctx context.Context, userId int) web.UserResponse {
+	tx, err := service.DB.Begin()
+	helper.ErrorConditionCheck(err)
+	defer helper.CommitOrRollback(tx)
+
+	user, err := service.UserRepository.FindById(ctx, tx, userId)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+	return helper.ToUserResponse(user)
+}
+
+func (service *UserServiceImpl) FindAll(ctx context.Context) []web.UserResponse {
+	tx, err := service.DB.Begin()
+	helper.ErrorConditionCheck(err)
+	defer helper.CommitOrRollback(tx)
+
+	users := service.UserRepository.FindAll(ctx, tx)
+	
+	return helper.ToUserResponses(users)
+}
 
 
 

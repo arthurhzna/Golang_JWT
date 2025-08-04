@@ -32,7 +32,7 @@ func ToUserLoginResponse(accessToken string, accessClaims *web.UserClaims, refre
 	}
 }
 
-func ToRenewAccessTokenResponse(accessToken string, accessClaims *web.UserClaims, refreshToken string) web.RenewAccessTokenResponse {
+func ToRenewAccessTokenResponse(accessToken string, accessClaims *web.UserClaims) web.RenewAccessTokenResponse {
 	return web.RenewAccessTokenResponse{
 		AccessToken: accessToken,
 		AccessTokenExpiresAt: accessClaims.ExpiresAt.Time,

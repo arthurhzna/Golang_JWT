@@ -27,4 +27,12 @@ func main() {
 	userService := service.NewUserService(userRepository, db, validate, userToken)
 	userController := controller.NewUserController(userService)
 
+	router := app.NewRouter(userController)
+	server := http.Server{
+		Addr: "localhost:3000",
+		Handler: router,
+	}
+	
+	err = server.ListenAndServe()
+	helper.ErrorConditionCheck(err)
 }

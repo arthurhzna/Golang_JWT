@@ -1,5 +1,5 @@
 package web
 
 type RenewAccessTokenRequest struct {
-	RefreshToken string `json:"refresh_token"`
+	RefreshToken string `validate:"required" json:"refresh_token"`
 }

@@ -11,4 +11,6 @@ type UserService interface {
 	Logout(ctx context.Context, sessionId string) 
 	RenewAccessToken(ctx context.Context, request web.RenewAccessTokenRequest) web.RenewAccessTokenResponse
 	RevokeSession(ctx context.Context, sessionId string)
+	FindById(ctx context.Context, userId int) web.UserResponse
+	FindAll(ctx context.Context) []web.UserResponse
 }
