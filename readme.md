@@ -40,6 +40,8 @@ Golang_JWT/
 │   └── web/              # API request/response models
 │       ├── user_*.go
 │       └── renew_access_token_*.go
+│       └── user_claims*.go
+│       └── web_response*.go
 ├── repository/            # Data access layer
 │   ├── user_repository.go
 │   └── user_repository_imp.go
