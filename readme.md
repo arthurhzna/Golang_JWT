@@ -120,8 +120,8 @@ POST /api/users/register
 Content-Type: application/json
 
 {
-    "username": "johndoe",
-    "email": "john@example.com",
+    "username": "arthurhzna",
+    "email": "arthur@example.com",
     "password": "securepassword123"
 }
 ```
@@ -133,8 +133,8 @@ Content-Type: application/json
     "status": "OK",
     "data": {
         "id": 1,
-        "username": "johndoe",
-        "email": "john@example.com"
+        "username": "arthurhzna",
+        "email": "arthur@example.com"
     }
 }
 ```
@@ -163,8 +163,8 @@ Content-Type: application/json
         "refresh_token_expires_at": "2024-01-02T12:00:00Z",
         "user": {
             "id": 1,
-            "username": "johndoe",
-            "email": "john@example.com"
+            "username": "arthurhzna",
+            "email": "arthur@example.com"
         }
     }
 }
