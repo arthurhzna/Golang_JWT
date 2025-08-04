@@ -1,13 +1,12 @@
 package token
 
 import (
-	"context"
-	"database/sql"
-	"golang_jwt/model/domain"
+	"golang_jwt/model/web"
+	"time"
 )
 
 
 type UserToken interface {
-	GenerateToken(user domain.User) (string, *web.UserClaims, error)
+	GenerateToken(id int, username string, email string, duration time.Duration) (string, *web.UserClaims, error)
 	ValidateToken(tokenString string) (*web.UserClaims, error)
 }

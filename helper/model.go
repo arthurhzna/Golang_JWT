@@ -27,7 +27,7 @@ func ToUserLoginResponse(accessToken string, accessClaims *web.UserClaims, refre
 		AccessToken: accessToken,
 		RefreshToken: refreshToken,
 		AccessTokenExpiresAt: accessClaims.ExpiresAt.Time,
-		RefreshTokenExpiresAt: session.Expires_At.Time,
+		RefreshTokenExpiresAt: session.Expires_At,
 		User: ToUserResponse(user),
 	}
 }

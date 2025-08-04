@@ -1,6 +1,9 @@
 package helper
 
-import "fmt"
+import (
+	"encoding/json"
+	"net/http"
+)
 
 func ReadFromRequestBody(request *http.Request, result interface{}) {
 	decoder := json.NewDecoder(request.Body)

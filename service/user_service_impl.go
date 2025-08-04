@@ -11,6 +11,7 @@ import (
 	"golang_jwt/token"
     "github.com/go-playground/validator/v10"
 	"time"
+	"errors"
 )
 
 type UserServiceImpl struct {
@@ -62,10 +63,10 @@ func (service *UserServiceImpl) Login(ctx context.Context, request web.UserLogin
 
 	helper.VerifyPassword(user.Password, request.Password)
 	
-	accessToken, accessClaims, err := service.UserToken.GenerateToken(user, 15*time.Minute)
+	accessToken, accessClaims, err := service.UserToken.GenerateToken(user.ID, user.Username, user.Email, 15*time.Minute)
 	helper.ErrorConditionCheck(err)
 
-    refreshToken, refreshClaims, err := service.UserToken.GenerateToken(user, 24*time.Hour)
+    refreshToken, refreshClaims, err := service.UserToken.GenerateToken(user.ID, user.Username, user.Email, 24*time.Hour)
     helper.ErrorConditionCheck(err)
 
 	session := domain.Session{
@@ -73,9 +74,9 @@ func (service *UserServiceImpl) Login(ctx context.Context, request web.UserLogin
 		User_Email: user.Email,
 		Refresh_Token: refreshToken,
 		Is_Revoked: false,
-		Expires_At: refreshClaims.RegisteredClaims.ExpiresAt,
+		Expires_At: refreshClaims.RegisteredClaims.ExpiresAt.Time,
 	}
-	session, err = service.UserRepository.CreateSession(ctx, tx, session)
+	session = service.UserRepository.CreateSession(ctx, tx, session)
 	helper.ErrorConditionCheck(err)
 
 	return helper.ToUserLoginResponse(accessToken, accessClaims, refreshToken, session, user)
@@ -88,7 +89,6 @@ func (service *UserServiceImpl) Logout(ctx context.Context, sessionId string) {
 
 	service.UserRepository.DeleteSession(ctx, tx, sessionId)
 	helper.ErrorConditionCheck(err)
-
 }
 
 func (service *UserServiceImpl) RenewAccessToken(ctx context.Context, request web.RenewAccessTokenRequest) web.RenewAccessTokenResponse {
@@ -113,10 +113,12 @@ func (service *UserServiceImpl) RenewAccessToken(ctx context.Context, request we
 		helper.ErrorConditionCheck(errors.New("refresh token is invalid"))
 	}
 
-	accessToken, accessClaims, err := service.UserToken.GenerateToken(user, 15*time.Minute) // ubah di user_token, jangan langsung menerima struct user, tetapi 1 1 saja
+	accessToken, accessClaims, err := service.UserToken.GenerateToken(refreshClaims.ID, refreshClaims.Username, refreshClaims.Email, 15*time.Minute) // ubah di user_token, jangan langsung menerima struct user, tetapi 1 1 saja
 	helper.ErrorConditionCheck(err)
 
 	return helper.ToRenewAccessTokenResponse(accessToken, accessClaims)
+
+}
 
 func (service *UserServiceImpl) RevokeSession(ctx context.Context, sessionId string) {
 	tx, err := service.DB.Begin()

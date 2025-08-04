@@ -1,9 +1,9 @@
-package append
+package app
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"rest_api_golang/controller"
-	"rest_api_golang/exception"
+	"golang_jwt/controller"
+	"golang_jwt/exception"
 )
 
 

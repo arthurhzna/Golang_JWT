@@ -3,7 +3,7 @@ package app
 import (
 	"database/sql"
 	"os"
-	"rest_api_golang/helper"
+	"golang_jwt/helper"
 	"time"
 	"github.com/joho/godotenv"
 	"fmt"

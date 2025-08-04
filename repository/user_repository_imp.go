@@ -69,11 +69,11 @@ func (repository *userRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.T
 	return user, nil
 }
 
-func (repository *userRepositoryImpl) CreateSession(ctx context.Context, tx *sql.Tx, session domain.Session) (domain.Session, error) {
+func (repository *userRepositoryImpl) CreateSession(ctx context.Context, tx *sql.Tx, session domain.Session) domain.Session {
 	SQL := "INSERT INTO sessions (id, user_email, refresh_token, is_revoked, expires_at) VALUES ($1, $2, $3, $4, $5)"
 	_, err := tx.ExecContext(ctx, SQL, session.ID, session.User_Email, session.Refresh_Token, session.Is_Revoked, session.Expires_At)
 	helper.ErrorConditionCheck(err)
-	return session, nil
+	return session
 }
 
 func (repository *userRepositoryImpl) GetSession(ctx context.Context, tx *sql.Tx, id string) (domain.Session, error) {

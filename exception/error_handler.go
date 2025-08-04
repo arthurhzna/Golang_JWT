@@ -3,8 +3,8 @@ package exception
 import (
 	"github.com/go-playground/validator/v10"
 	"net/http"
-	"rest_api_golang/helper"
-	"rest_api_golang/model/web"
+	"golang_jwt/helper"
+	"golang_jwt/model/web"
 )
 
 func ErrorHandler(writer http.ResponseWriter, request *http.Request, err interface{}) {
