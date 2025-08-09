@@ -25,14 +25,14 @@ func (repository *userRepositoryImpl) Register(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository *userRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, userId int) (domain.User, error) {
-	SQL := "SELECT username, email FROM users WHERE id = $1"
+	SQL := "SELECT id, username, email FROM users WHERE id = $1"
 	rows, err := tx.QueryContext(ctx, SQL, userId)
 	helper.ErrorConditionCheck(err)
 	defer rows.Close()
 
 	user := domain.User{}
 	if rows.Next() {
-		err := rows.Scan(&user.Username, &user.Email)
+		err := rows.Scan(&user.ID, &user.Username, &user.Email)
 		helper.ErrorConditionCheck(err)
 		return user, nil
 	} else {
@@ -96,6 +96,13 @@ func (repository *userRepositoryImpl) RevokeSession(ctx context.Context, tx *sql
 func (repository *userRepositoryImpl) DeleteSession(ctx context.Context, tx *sql.Tx, id string) error {
 	SQL := "DELETE FROM sessions WHERE id = $1"
 	_, err := tx.ExecContext(ctx, SQL, id)
+	helper.ErrorConditionCheck(err)
+	return nil
+}
+
+func (repository *userRepositoryImpl) DeleteExpiredSessions(ctx context.Context, tx *sql.Tx) error {
+	SQL := "DELETE FROM sessions WHERE expires_at < NOW()"
+	_, err := tx.ExecContext(ctx, SQL)
 	helper.ErrorConditionCheck(err)
 	return nil
 }

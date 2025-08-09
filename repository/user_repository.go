@@ -15,6 +15,8 @@ type UserRepository interface {
 	GetSession(ctx context.Context, tx *sql.Tx, id string) (domain.Session, error)
 	RevokeSession(ctx context.Context, tx *sql.Tx, id string) error
 	DeleteSession(ctx context.Context, tx *sql.Tx, id string) error
+
+	DeleteExpiredSessions(ctx context.Context, tx *sql.Tx) error
 }
 
 
